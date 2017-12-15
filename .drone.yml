@@ -1,0 +1,20 @@
+pipeline:
+  build:
+    image: kaitest/alpine-jdk8:0.0.1
+    commands:
+      - chmod 777 gradlew
+      - ./gradlew build
+  publish:
+    image: plugins/gcr
+    registry: asia.gcr.io
+    repo: devops-186506/spring-boot-test
+    dockerfile: ./Dockerfile
+    tags: ${DRONE_TAG}
+    secrets: [google_credentials]
+  deploy:
+    image: nytimes/drone-gke
+    zone: asia-east1-a
+    cluster: test-cluster
+    secrets: [google_credentials]
+    commands:
+      - kubectl get pods
